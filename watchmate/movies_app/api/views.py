@@ -1,13 +1,27 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-from movies_app.models import Movie
-from movies_app.serializers import  MovieSerializer
+from movies_app.models import Movie, Platform
+from movies_app.serializers import  MovieSerializer, PlatformSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 
 
+class PlatformListAV(APIView):
+    def get(self, request):
+        platforms = Platform.objects.all()
+        serializer = PlatformSerializer(platforms, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = PlatformSerializer(data = request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+        
 
 class MovieListAV(APIView):
     def get(self, request):
