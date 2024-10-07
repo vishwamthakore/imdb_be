@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-from movies_app.models import Movie, Platform
-from movies_app.serializers import  MovieSerializer, PlatformSerializer
+from movies_app.models import Platform, Movie, Review
+from movies_app.serializers import  MovieSerializer, PlatformSerializer, ReviewSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework import mixins, generics
 
 
 class PlatformListAV(APIView):
@@ -65,8 +66,20 @@ class MovieDetailAV(APIView):
         movie = self.get_object(id)
         movie.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-        
+    
+    
 
+class ReviewListAV(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):        
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+        
+        
 # @api_view(['GET', 'POST'])
 # def get_all_movies(request):
     

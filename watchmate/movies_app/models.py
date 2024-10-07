@@ -21,3 +21,22 @@ class Movie(models.Model):
     def __str__(self):
         return self.name
     
+    
+class Review(models.Model):
+    RATINGS = [
+        (1 , "1 - Bad"),
+        (2 , "2 - Average"),
+        (3 , "3 - Good"),
+        (4 , "4 - V Good"),
+        (5 , "5 - Excellent")
+    ]
+    
+    rating = models.IntegerField(choices=RATINGS)
+    description = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="reviews")
+    
+    def __str__(self):
+        return f"{self.rating} | {self.movie.name}" 
+    
+    

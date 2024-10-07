@@ -1,6 +1,11 @@
 from rest_framework import serializers
-from movies_app.models import Movie, Platform
+from movies_app.models import Review, Movie, Platform
 
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'
+        
 
 class MovieSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
@@ -9,9 +14,10 @@ class MovieSerializer(serializers.Serializer):
     is_active = serializers.BooleanField(default=True)
     created_at = serializers.DateTimeField(required=False)
         
-    platform_name = serializers.CharField(source='platform.name', read_only=True)
+    # platform_name = serializers.CharField(source='platform.name', read_only=True)
     platform_id = serializers.IntegerField(write_only=True)
-     
+    
+    reviews = ReviewSerializer(many=True, read_only=True)
 
     
     def create(self, validated_data):
@@ -56,4 +62,6 @@ class PlatformSerializer(serializers.Serializer):
         instance.website = validated_data.get('website', instance.is_active)
         instance.save()
         return instance
+    
+    
     
