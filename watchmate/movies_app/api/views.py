@@ -98,9 +98,17 @@ class ReviewListAV(APIView):
         
         print("review data", request.data)
         request.data["movie"] = id
+        request.data["user"] = request.user.id 
+        
         serializer = ReviewSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            
+            movie = Movie.objects.get(id=id)
+            movie.total_ratings += 1
+            movie.average_rating = (movie.average_rating + serializer.validated_data.get("rating"))/2
+            movie.save()
+            
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=400)
