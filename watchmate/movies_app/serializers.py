@@ -8,7 +8,22 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 
-class MovieSerializer(serializers.Serializer):
+class MovieSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = '__all__'
+    
+    platform_name = serializers.CharField(source='platform.name', read_only=True)
+    # reviews = ReviewSerializer(many=True, read_only=True)
+    
+    def validate(self, data):
+        if len(data.get("name")) <= 2:
+            raise serializers.ValidationError("Name should be longer than 2 characters")
+        return data
+        
+    
+
+class MovieSerializerOld(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=100)
     description = serializers.CharField(max_length=200)
