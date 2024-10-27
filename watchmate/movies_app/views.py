@@ -8,10 +8,12 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import mixins, generics
 from rest_framework.permissions import IsAuthenticated
-
+from movies_app.throttling import MovieRateThrottle, PlatformRateThrottle
 
 class PlatformListView(APIView):
-    def get(self, request):
+    throttle_classes = [PlatformRateThrottle]
+    
+    def get(self, request): 
         platforms = Platform.objects.all()
         serializer = PlatformSerializer(platforms, many=True)
         return Response(serializer.data)
@@ -25,8 +27,15 @@ class PlatformListView(APIView):
         
 
 class MovieListView(APIView):
+    throttle_classes = [MovieRateThrottle]
+    
     def get(self, request):
-        movies = Movie.objects.all()    
+        movie_name = self.request.query_params.get("name")        
+        if movie_name:
+            movies = Movie.objects.filter(name=movie_name)
+        else:
+            movies = Movie.objects.all()
+            
         serializer = MovieSerializer(movies, many=True)
         return Response(serializer.data)
     
